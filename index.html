@@ -86,8 +86,27 @@
       <button>Trigger a Global Error</button>
     </section>
   </main>
-
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
   <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "bd7280e76f5243819cae442f46636103"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>
+  
+  <script>
+    window.onerror = function(message, source, lineno, colno, error) {
+      console.log("Global Error");
+      console.log("Message:", message);
+
+      return true; // prevents the browser's default error handling
+    };
+    class CalculatorError extends Error {
+      constructor(message) {
+      super(message);
+      this.name = "CalculatorError";
+      }
+    }
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -95,13 +114,121 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      try {
+        if (firstNum === "" || secondNum === "") {
+          throw new Error("Both numbers are required.");
+        }
+
+        if (isNaN(firstNum) || isNaN(secondNum)) {
+          throw new CalculatorError("Inputs must be valid numbers.");
+        }
+
+        if (operator === "/" && Number(secondNum) === 0) {
+          throw new CalculatorError("Cannot divide by zero.");
+        }
+
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      }
+      catch (error) {
+        if (error instanceof CalculatorError) {
+          console.error(`Calculator Error: ${error.message}`);
+          output.textContent = error.message;
+        } else {
+          console.error("Unexpected Error:", error);
+        }
+      }
+      finally {
+        console.log("Calculation attempted.");
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
     // Start your code here
     // You may move this JS to another file if you wish
+
+    // Console Log
+    errorBtns[0].addEventListener("click", () => {
+      console.log("This is a console log");
+    });
+
+    // Console Error
+    errorBtns[1].addEventListener("click", () => {
+      console.error("This is a console error");
+    });
+
+    // Console Count
+    errorBtns[2].addEventListener("click", () => {
+      console.count("Button Click");
+    });
+
+    // Console Warn
+    errorBtns[3].addEventListener("click", () => {
+      console.warn("This is a warning message");
+    });
+
+    // Console Assert
+    errorBtns[4].addEventListener("click", () => {
+      console.assert(2 + 2 === 5, "Assertion failed!");
+    });
+
+    // Console Clear
+    errorBtns[5].addEventListener("click", () => {
+      console.clear();
+    });
+
+    // Console Dir
+    errorBtns[6].addEventListener("click", () => {
+      console.dir(document.querySelector("form"));
+    });
+
+    // Console dirxml
+    errorBtns[7].addEventListener("click", () => {
+      console.dirxml(document.querySelector("main"));
+    });
+
+    // Console Group Start
+    errorBtns[8].addEventListener("click", () => {
+      console.group("Console Group");
+      console.log("Hello");
+      console.log("Goodbye");
+    });
+
+    // Console Group End
+    errorBtns[9].addEventListener("click", () => {
+      console.groupEnd();
+    });
+
+    // Console Table
+    errorBtns[10].addEventListener("click", () => {
+      console.table([
+        { class: "cse110", students: 300 },
+        { class: "cse101", students: 250 },
+        { class: "cse151a", students: 70 }
+      ]);
+    });
+
+    // Start Timer
+    errorBtns[11].addEventListener("click", () => {
+      console.time("timer");
+    });
+
+    // End Timer
+    errorBtns[12].addEventListener("click", () => {
+      console.timeEnd("timer");
+    });
+
+    // Console Trace
+    errorBtns[13].addEventListener("click", () => {
+      function traceDemo() {
+        console.trace("Call stack");
+      }
+      traceDemo();
+    });
+    errorBtns[14].addEventListener("click", () => {
+      NotAvailable();
+    });
+    TrackJS.track('Testing TrackJS!');
   </script>
 </body>
 
